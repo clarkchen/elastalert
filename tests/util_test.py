@@ -240,15 +240,13 @@ def test_parse_host():
 
 
 def test_es_connet():
+    """
+    steps:
+        1. create local three node es-cluster: `docker-compose -f docker-compose-es.yml up`
+        2. pytest tests/util_test.py::test_es_connet -v
+    :return:
+    """
     hosts = "localhost:9200, localhost:9201, localhost:9202"
-    hosts_new = parse_host(hosts)
-    print(hosts_new)
-    # hosts = "localhost"
-    es = Elasticsearch(hosts_new, es_port=9200
-                       )
-
-    print(es.info())
-    print(es.cluster.stats())
     es_conn_config = build_es_conn_config({'es_host': hosts, 'es_port': 9200, 'es_conn_timeout': 400})
     es = ElasticSearchClient(es_conn_config)
     print(es.info())
