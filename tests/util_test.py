@@ -5,8 +5,10 @@ from datetime import timedelta
 import mock
 import pytest
 from dateutil.parser import parse as dt
+from elasticsearch import Elasticsearch
 
-from elastalert.util import add_raw_postfix, parse_host
+from elastalert import ElasticSearchClient
+from elastalert.util import add_raw_postfix, parse_host, build_es_conn_config
 from elastalert.util import format_index
 from elastalert.util import lookup_es_key
 from elastalert.util import parse_deadline
@@ -235,3 +237,24 @@ def test_parse_host():
     assert parse_host("host1:9200, host2:9200, host3:9300") ==["host1:9200",
                                                                         "host2:9200",
                                                                         "host3:9300"]
+
+
+def test_es_connet():
+    hosts = "localhost:9200, localhost:9201, localhost:9202"
+    hosts_new = parse_host(hosts)
+    print(hosts_new)
+    # hosts = "localhost"
+    es = Elasticsearch(hosts_new, es_port=9200
+                       )
+
+    print(es.info())
+    print(es.cluster.stats())
+    es_conn_config = build_es_conn_config({'es_host': hosts, 'es_port': 9200, 'es_conn_timeout': 400})
+    es = ElasticSearchClient(es_conn_config)
+    print(es.info())
+    print(es.cluster.stats())
+
+    es_conn_config = build_es_conn_config({'es_host': "localhost", 'es_port': 9200, 'es_conn_timeout': 400})
+    es = ElasticSearchClient(es_conn_config)
+    print(es.info())
+    print(es.cluster.stats())
